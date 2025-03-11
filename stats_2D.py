@@ -25,17 +25,17 @@ key_points = ['SJC', 'EJC', 'WJC', 'HMJC']
 
 for ind_point,points in enumerate(key_points):
     percentage_data = []
-    for name_config in camera_configurations:
+    for orientation_camera in camera_configurations:
         for model in list_model:
-            for value in dict_final[model][name_config][points]:
-                data.append([model, name_config, points, value])
+            for value in dict_final[model][orientation_camera][points]:
+                data.append([model, orientation_camera, points, value])
 
     # Create DataFrames
-    df = pd.DataFrame(data, columns=['Model', 'name_config', 'Joint', 'Value'])
+    df = pd.DataFrame(data, columns=['Model', 'orientation_camera', 'Joint', 'Value'])
 
 
 df_clean = df.dropna(subset=['Value'])
-model_formula = "Value ~ C(Model) + C(name_config) + C(Joint) + C(Model):C(name_config)"
+model_formula = "Value ~ C(Model) + C(orientation_camera) + C(Joint) + C(Model):C(orientation_camera)"
 anova_model = ols(model_formula, df_clean).fit()
 anova_table = sm.stats.anova_lm(anova_model, typ=2)
 print(anova_table)
@@ -53,7 +53,7 @@ print(f"Cohen's f for model: {cohens_f}")
 
 
 df_clean = df.dropna(subset=['Value'])
-model_formula = "Value ~ C(Model) + C(name_config) + C(Model):C(name_config)"
+model_formula = "Value ~ C(Model) + C(orientation_camera) + C(Model):C(orientation_camera)"
 anova_model = ols(model_formula, df_clean).fit()
 anova_table = sm.stats.anova_lm(anova_model, typ=2)
 print(anova_table)
@@ -64,7 +64,7 @@ ss_error = anova_table['sum_sq']['Residual']
 partial_eta_squared = ss_model / (ss_model + ss_error)
 print(f"Partial eta squared for model: {partial_eta_squared}")
 
-ss_model = anova_table['sum_sq']['C(name_config)']
+ss_model = anova_table['sum_sq']['C(orientation_camera)']
 ss_error = anova_table['sum_sq']['Residual']
 partial_eta_squared = ss_model / (ss_model + ss_error)
 print(f"Partial eta squared for name config: {partial_eta_squared}")
@@ -92,6 +92,6 @@ print(f"Cohen's f for model: {cohens_f}")
 #     upper = np.percentile(boot_eta_sq, 97.5)
 #     return lower, upper
 #
-# formula = 'error ~ C(Model) * C(name_config)'
+# formula = 'error ~ C(Model) * C(orientation_camera)'
 # lower_ci, upper_ci = bootstrap_partial_eta_sq(df_clean, formula, 'C(Model)', n_boot=1000)
 # print(f"95% CI for Partial Eta Squared (Model): [{lower_ci:.3f}, {upper_ci:.3f}]")
